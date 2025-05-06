@@ -22,7 +22,7 @@
 1. Viết địa chỉ IP gốc và subnet mask ra dạng nhị phân (chỉ quan tâm đến hai octet thứ 3 để dễ hình dung):
 
    ```
-   IP:       139 . 204 .   88   .   22
+   IP:            139   .    204   .    88    .   22
    Nhị phân: … 10001011 . 11001100 . 01011000 . 00010110
    Mask /19: … 11111111 . 11111111 . 11100000 . 00000000
    ```
