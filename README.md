@@ -1,104 +1,74 @@
-Đã suy nghĩ trong giây lát
+Đã suy nghĩ trong vài giây
 
 
-Để bạn – người mới bắt đầu – dễ hình dung, mình sẽ chia làm 4 bước chính:
-
-1. **Xác định mặt nạ mạng (subnet mask) từ “/19”**
-2. **Chuyển địa chỉ IP về dạng nhị phân**
-3. **Tính địa chỉ mạng (network address) và địa chỉ quảng bá (broadcast address)**
-4. **Xác định dải IP khả dụng (usable hosts)**
+Để tính dải địa chỉ (IP range) cho mạng **139.204.88.22/19**, ta làm theo các bước rất đơn giản dưới đây.
 
 ---
 
-## 1. Xác định subnet mask của /19
+## 1. Hiểu rõ “/19” nghĩa là gì
 
-* `/19` nghĩa là có **19 bit** dành cho phần mạng (network), còn lại 13 bit cho phần host.
-* Mặt nạ mạng (decimal) sẽ là:
+* “/19” là **độ dài phần mạng** (network prefix length), tức có **19 bit** dành cho phần mạng, phần còn lại (32−19=13 bit) dành cho phần host.
+* Tương đương với **subnet mask**:
 
-  | Octet thứ | 1        | 2        | 3        | 4        |
-  | --------- | -------- | -------- | -------- | -------- |
-  | Bit mask  | 8 bit    | 8 bit    | 3 bit    | 0 bit    |
-  | Nhị phân  | 11111111 | 11111111 | 11100000 | 00000000 |
-  | Thập phân | 255      | 255      | 224      | 0        |
-
-**Kết luận:** subnet mask = **255.255.224.0**
+  ```
+  11111111.11111111.11100000.00000000
+  → 255.255.224.0
+  ```
 
 ---
 
-## 2. Chuyển IP 139.204.88.22 về nhị phân
+## 2. Xác định địa chỉ mạng (Network Address)
 
-| Octet     | Giá trị thập phân | Nhị phân |
-| --------- | ----------------- | -------- |
-| 1st (139) | 139               | 10001011 |
-| 2nd (204) | 204               | 11001100 |
-| 3rd (88)  | 88                | 01011000 |
-| 4th (22)  | 22                | 00010110 |
+1. Viết địa chỉ IP gốc và subnet mask ra dạng nhị phân (chỉ quan tâm đến hai octet thứ 3 để dễ hình dung):
 
-Vậy IP nhị phân:
+   ```
+   IP:       139 . 204 .   88   .   22
+   Nhị phân: … 10001011 . 11001100 . 01011000 . 00010110
+   Mask /19: … 11111111 . 11111111 . 11100000 . 00000000
+   ```
 
-```
-10001011 . 11001100 . 01011000 . 00010110
-```
+2. Thực hiện phép **AND** giữa IP và mask để lấy địa chỉ mạng:
 
----
+   * Octet 1,2 giống nhau (139.204).
+   * Octet 3:
 
-## 3. Tính Network và Broadcast
+     ```
+     01011000 (88)
+     AND
+     11100000 (224)
+     = 01000000 (64)
+     ```
+   * Octet 4:
 
-### 3.1. Network Address
+     ```
+     00010110 (22)
+     AND
+     00000000 (0)
+     = 00000000 (0)
+     ```
 
-* Giữ nguyên **19 bit** đầu của IP, các bit còn lại (13 bit) đặt =0.
-
-  * Hai octet đầu (16 bit) giữ nguyên:
-
-    ```
-    10001011 . 11001100  → 139 . 204
-    ```
-  * Trong octet thứ 3, giữ 3 bit đầu, 5 bit sau đặt 0:
-
-    ```
-    01011000  
-    → chỉ lấy 3 bit đầu: 010  
-    → nối 5 bit 0: 01000000  = 64
-    ```
-  * Octet thứ 4 toàn bộ =0.
-
-* **Network address** = **139.204.64.0**
-
-### 3.2. Broadcast Address
-
-* Broadcast = Network + (số host trong mạng) – 1.
-
-* Số host trong /19 = 2⁽³²–19⁾ = 2¹³ = 8192 địa chỉ.
-
-* Nhưng chúng ta cộng tới địa chỉ cuối trong khối, tức cộng 8192–1 = 8191.
-
-* Cách đơn giản hơn:
-
-  * Khoảng nhảy (block size) ở octet 3 = 256 – 224 = 32 → mạng bắt đầu tại 0,32,64,96,…
-  * Mạng của chúng ta bắt đầu ở 64 → kết thúc ở 64+32–1 = 95.
-  * Octet 4 = 255.
-
-* **Broadcast address** = **139.204.95.255**
+   → **Địa chỉ mạng**: `139.204.64.0`
 
 ---
 
-## 4. Dải IP khả dụng (Usable Hosts)
+## 3. Xác định địa chỉ quảng bá (Broadcast Address)
 
-* **First usable** (địa chỉ đầu tiên dùng cho host) = Network + 1 = **139.204.64.1**
-* **Last usable** (địa chỉ cuối cùng dùng cho host) = Broadcast – 1 = **139.204.95.254**
-* **Tổng số host khả dụng** = 2¹³ – 2 = **8190** (bỏ network và broadcast)
+* Với /19, phần host có 13 bit → tổng số địa chỉ trong mạng = 2¹³ = 8192 địa chỉ.
+* Địa chỉ mạng là số thấp nhất (offset 0), địa chỉ quảng bá là số cao nhất (offset 8191).
+* Giá trị bước (block size) ở octet thứ 3 = 256 − 224 = 32. Như vậy octet thứ 3 chạy từ 64 → 64+31 = 95.
+
+→ **Broadcast**: `139.204.95.255`
+
+---
+
+## 4. Dải địa chỉ host có thể cấp (Usable Hosts)
+
+* **Host đầu tiên** (first usable): địa chỉ mạng + 1
+  → `139.204.64.1`
+* **Host cuối cùng** (last usable): địa chỉ broadcast − 1
+  → `139.204.95.254`
+* **Tổng số host khả dụng** = 2¹³ − 2 = 8190 hosts.
 
 ---
 
-### Tóm tắt kết quả
 
-| Thông số          | Địa chỉ        |
-| ----------------- | -------------- |
-| Subnet mask (/19) | 255.255.224.0  |
-| Network address   | 139.204.64.0   |
-| Broadcast address | 139.204.95.255 |
-| First usable host | 139.204.64.1   |
-| Last usable host  | 139.204.95.254 |
-| Số host khả dụng  | 8.190          |
-
----
