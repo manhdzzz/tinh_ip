@@ -53,9 +53,22 @@
 
 ## 3. Xác định địa chỉ quảng bá (Broadcast Address)
 
-* Với /19, phần host có 13 bit → tổng số địa chỉ trong mạng = 2¹³ = 8192 địa chỉ.
-* Địa chỉ mạng là số thấp nhất (offset 0), địa chỉ quảng bá là số cao nhất (offset 8191).
-* Giá trị bước (block size) ở octet thứ 3 = 256 − 224 = 32. Như vậy octet thứ 3 chạy từ 64 → 64+31 = 95.
+Tính Net ID
+Ta cần xác định Net ID bằng cách lấy địa chỉ IP và thực hiện phép AND với subnet mask:
+
+IP: 139.204.88.22 = 10001011.11001100.01011000.00010110
+
+Subnet mask: 255.255.224.0 = 11111111.11111111.11100000.00000000
+
+AND kết quả: 10001011.11001100.01000000.00000000 → 139.204.64.0
+
+>> Net ID: 139.204.64.0
+
+Network Address:       11111111.11111111.11100000.00000000
+Wildcard mask:     00000000.00000000.00011111.11111111
+Net ID:                10001011.11001100.01011000.00010110
+Broadcast (OR):    10001011.11001100.01011111.11111111 = 139.204.95.255
+
 
 → **Broadcast**: `139.204.95.255`
 
